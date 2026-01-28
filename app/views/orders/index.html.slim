@@ -1,0 +1,22 @@
+table.orders-list.table
+  thead
+    tr
+      th Référence
+      th Status
+      th Client
+      th Transporteur
+      th Status expédition
+      th Quantité totale
+      th Montant total
+  tbody
+    - orders.each do |order|
+      tr
+        td=order.reference
+        td=order.status_name
+        td=order.customer
+        td=order.fulfillment.fulfillment_service
+        td=order.fulfillment_status
+        td.text-right= order.total_quantity
+        td.text-right= order.total_price
+
+= paginate orders, remote: true
