@@ -23,6 +23,7 @@ module Invoices
   #
   class NeedingFollowUpQuery < ApplicationQuery
     include GroupedQuery
+    include Averageable
 
     has_groups(
       critical: :critical,
@@ -136,14 +137,9 @@ module Invoices
 
     # Calculates average days overdue for all overdue invoices.
     def average_days_overdue
-      overdue_invoices = relation.overdue
-      return 0 if overdue_invoices.empty?
-
-      total_days = overdue_invoices.sum do |invoice|
+      safe_average(relation.overdue, precision: 1) do |invoice|
         (Date.current - invoice.due_at).to_i
       end
-
-      (total_days.to_f / overdue_invoices.count).round(1)
     end
   end
 end

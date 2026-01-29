@@ -25,6 +25,7 @@ module Fulfillments
   #
   class DelayedQuery < ApplicationQuery
     include GroupedQuery
+    include Averageable
 
     has_groups(
       stuck_pending: :stuck_in_pending,
@@ -151,23 +152,14 @@ module Fulfillments
 
     # Calculates average delay days across all delayed fulfillments.
     def average_delay_days
-      delayed = call
-      return 0 if delayed.empty?
-
-      total_delay = delayed.sum do |f|
+      safe_average(call, precision: 1) do |f|
         case f.status
-        when "pending"
-          (Time.current - f.created_at).to_i / 1.day
-        when "processing"
-          (Time.current - f.updated_at).to_i / 1.day
-        when "shipped"
-          (Time.current - f.shipped_at).to_i / 1.day
-        else
-          0
+        when "pending" then (Time.current - f.created_at).to_i / 1.day
+        when "processing" then (Time.current - f.updated_at).to_i / 1.day
+        when "shipped" then (Time.current - f.shipped_at).to_i / 1.day
+        else 0
         end
       end
-
-      (total_delay.to_f / delayed.count).round(1)
     end
   end
 end

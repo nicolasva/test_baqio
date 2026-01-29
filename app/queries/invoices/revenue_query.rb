@@ -22,6 +22,7 @@ module Invoices
   #
   class RevenueQuery < ApplicationQuery
     include PeriodFilterable
+    include Averageable
 
     # Initializes with optional period filter.
     #
@@ -119,10 +120,7 @@ module Invoices
     #
     # @return [Float] average revenue per invoice
     def average_invoice_value
-      invoices = call
-      return 0 if invoices.empty?
-
-      (invoices.sum(:total_amount) / invoices.count).round(2)
+      safe_average(call, :total_amount)
     end
 
     # Revenue breakdown by customer.

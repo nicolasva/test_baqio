@@ -16,6 +16,8 @@ module Orders
   #   query.top_products(limit: 5)
   #
   class WithRevenueQuery < ApplicationQuery
+    include Averageable
+
     def initialize(relation = default_relation)
       super(relation)
     end
@@ -75,10 +77,7 @@ module Orders
     #
     # @return [Float] average order value
     def average_revenue
-      total = paid_orders_count
-      return 0 if total.zero?
-
-      (total_revenue / total).round(2)
+      safe_average(call, "invoices.total_amount")
     end
 
     # Counts the number of paid orders.

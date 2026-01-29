@@ -20,6 +20,7 @@ module Fulfillments
   #   # => [{ carrier: "UPS", total_deliveries: 200, avg_transit_days: 2.8 }, ...]
   #
   class PerformanceQuery < ApplicationQuery
+    include PeriodFilterable
     # Initializes with optional period filter.
     #
     # @param relation [ActiveRecord::Relation] base relation
@@ -83,44 +84,25 @@ module Fulfillments
     #
     # @return [Array<Hash>] carrier performance data
     def performance_by_carrier
-      relation
-        .delivered
-        .where.not(carrier: [nil, ""])
-        .group(:carrier)
-        .select(
-          :carrier,
-          "COUNT(*) as total_deliveries",
-          "AVG(JULIANDAY(delivered_at) - JULIANDAY(shipped_at)) as avg_transit_days"
-        )
-        .map do |record|
-          {
-            carrier: record.carrier,
-            total_deliveries: record.total_deliveries,
-            avg_transit_days: record.avg_transit_days&.round(1)
-          }
-        end
+      performance_by_dimension(
+        scope: relation.delivered.where.not(carrier: [nil, ""]),
+        group_by: :carrier,
+        label_key: :carrier,
+        label_attr: :carrier
+      )
     end
 
     # Analyzes performance by fulfillment service.
     #
     # @return [Array<Hash>] service performance data
     def performance_by_service
-      relation
-        .delivered
-        .joins(:fulfillment_service)
-        .group("fulfillment_services.id", "fulfillment_services.name")
-        .select(
-          "fulfillment_services.name as service_name",
-          "COUNT(*) as total_deliveries",
-          "AVG(JULIANDAY(fulfillments.delivered_at) - JULIANDAY(fulfillments.shipped_at)) as avg_transit_days"
-        )
-        .map do |record|
-          {
-            service_name: record.service_name,
-            total_deliveries: record.total_deliveries,
-            avg_transit_days: record.avg_transit_days&.round(1)
-          }
-        end
+      performance_by_dimension(
+        scope: relation.delivered.joins(:fulfillment_service),
+        group_by: ["fulfillment_services.id", "fulfillment_services.name"],
+        label_key: :service_name,
+        label_attr: :service_name,
+        extra_select: "fulfillment_services.name as service_name"
+      )
     end
 
     # Groups deliveries by transit time buckets.
@@ -162,20 +144,34 @@ module Fulfillments
 
     # Applies period filter to delivered_at.
     def filter_by_period(rel)
-      case @period
-      when Range
-        rel.where(delivered_at: @period)
-      when :this_week
-        rel.where(delivered_at: Time.current.all_week)
-      when :this_month
-        rel.where(delivered_at: Time.current.all_month)
-      when :this_quarter
-        rel.where(delivered_at: Time.current.all_quarter)
-      when :last_month
-        rel.where(delivered_at: 1.month.ago.all_month)
-      else
-        rel
-      end
+      rel.where(delivered_at: resolve_period(@period))
+    end
+
+    # Groups delivered fulfillments by a dimension and computes delivery stats.
+    #
+    # @param scope [ActiveRecord::Relation] base scope (already filtered/joined)
+    # @param group_by [Symbol, Array<String>] column(s) to group by
+    # @param label_key [Symbol] key name in the output hash
+    # @param label_attr [Symbol] attribute name on the record for the label value
+    # @param extra_select [String, nil] additional SQL select expression
+    # @return [Array<Hash>] performance data per dimension
+    def performance_by_dimension(scope:, group_by:, label_key:, label_attr:, extra_select: nil)
+      selects = Array(group_by) + [
+        "COUNT(*) as total_deliveries",
+        "AVG(JULIANDAY(#{scope.table_name}.delivered_at) - JULIANDAY(#{scope.table_name}.shipped_at)) as avg_transit_days"
+      ]
+      selects.push(extra_select) if extra_select
+
+      scope
+        .group(*Array(group_by))
+        .select(*selects)
+        .map do |record|
+          {
+            label_key => record.send(label_attr),
+            total_deliveries: record.total_deliveries,
+            avg_transit_days: record.avg_transit_days&.round(1)
+          }
+        end
     end
   end
 end

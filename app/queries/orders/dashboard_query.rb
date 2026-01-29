@@ -18,6 +18,7 @@ module Orders
   #
   class DashboardQuery < ApplicationQuery
     include PeriodFilterable
+    include Averageable
 
     # Initializes the dashboard query with a time period.
     #
@@ -92,9 +93,7 @@ module Orders
 
     # Calculates average order value.
     def average_order_value(orders)
-      return 0 if orders.empty?
-
-      orders.average(:total_amount).to_f.round(2)
+      safe_average(orders, :total_amount)
     end
 
     # Groups orders by status with counts.
