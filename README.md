@@ -29,6 +29,76 @@ bin/rails db:migrate
 bin/rails db:seed
 ```
 
+## Seedbank - Gestion des seeds
+
+L'application utilise [Seedbank](https://github.com/james2m/seedbank) pour organiser les seeds par environnement et gerer les dependances entre eux.
+
+### Lancer les seeds
+
+```bash
+# Lancer tous les seeds (equivalent a db:seed)
+bin/rails db:seed
+
+# Lancer tous les seeds de development
+bin/rails db:seed:development
+
+# Lancer tous les seeds de test
+bin/rails db:seed:test
+
+# Lancer les seeds partages (shared)
+bin/rails db:seed:shared
+```
+
+### Lancer un seed specifique
+
+```bash
+# Seeds development
+bin/rails db:seed:development:01_accounts
+bin/rails db:seed:development:02_customers
+bin/rails db:seed:development:03_orders
+
+# Seeds partages
+bin/rails db:seed:shared:fulfillment_services
+
+# Seeds test
+bin/rails db:seed:test:accounts
+```
+
+### Lister les seeds disponibles
+
+```bash
+bin/rails --tasks | grep seed
+```
+
+### Structure des seeds
+
+```
+db/seeds/
+├── development/
+│   ├── 01_accounts.seeds.rb      # Comptes de demo
+│   ├── 02_customers.seeds.rb     # Clients de test
+│   └── 03_orders.seeds.rb        # Commandes de test
+├── shared/
+│   └── fulfillment_services.seeds.rb  # Services d'expedition (tous environnements)
+└── test/
+    └── accounts.seeds.rb         # Comptes pour les tests
+```
+
+### Dependances entre seeds
+
+Les seeds peuvent declarer des dependances avec `after` :
+
+```ruby
+# Ce seed s'execute apres development:01_accounts
+after "development:01_accounts" do
+  # ...
+end
+```
+
+### Ordre d'execution
+
+Les fichiers sont executes par ordre alphabetique. Utilisez des prefixes numeriques (01_, 02_, etc.) pour controler l'ordre.
+
 ## Lancer le serveur
 
 ```bash
