@@ -19,6 +19,15 @@ module Orders
   #   query.grouped  # => { pending_too_long: [...], ... }
   #
   class NeedingAttentionQuery < ApplicationQuery
+    include GroupedQuery
+
+    has_groups(
+      pending_too_long: :pending_too_long,
+      validated_not_invoiced: :validated_not_invoiced,
+      invoiced_overdue: :invoiced_with_overdue_payment,
+      awaiting_shipment: :awaiting_shipment
+    )
+
     # Orders pending longer than this need attention
     PENDING_THRESHOLD_DAYS = 3
     # Validated orders older than this without invoice need attention
@@ -32,20 +41,7 @@ module Orders
     #
     # @return [ActiveRecord::Relation] orders requiring action
     def call
-      relation.where(id: orders_needing_attention_ids)
-    end
-
-    # Returns orders grouped by problem type.
-    # Useful for dashboards and prioritization.
-    #
-    # @return [Hash] orders categorized by issue type
-    def grouped
-      {
-        pending_too_long: pending_too_long,
-        validated_not_invoiced: validated_not_invoiced,
-        invoiced_overdue: invoiced_with_overdue_payment,
-        awaiting_shipment: awaiting_shipment
-      }
+      relation.where(id: all_ids)
     end
 
     # Orders stuck in pending status for too long.
@@ -101,16 +97,5 @@ module Orders
       Order.all
     end
 
-    # Collects all unique order IDs from all problem categories.
-    #
-    # @return [Array<Integer>] unique order IDs needing attention
-    def orders_needing_attention_ids
-      [
-        pending_too_long.pluck(:id),
-        validated_not_invoiced.pluck(:id),
-        invoiced_with_overdue_payment.pluck(:id),
-        awaiting_shipment.pluck(:id)
-      ].flatten.uniq
-    end
   end
 end

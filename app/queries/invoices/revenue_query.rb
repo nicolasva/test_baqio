@@ -21,6 +21,8 @@ module Invoices
   #   # => { "01" => 15000, "02" => 18000, ... }
   #
   class RevenueQuery < ApplicationQuery
+    include PeriodFilterable
+
     # Initializes with optional period filter.
     #
     # @param relation [ActiveRecord::Relation] base relation
@@ -146,28 +148,7 @@ module Invoices
 
     # Applies period filter to relation.
     def filter_by_period(rel)
-      case @period
-      when Range
-        rel.where(paid_at: @period)
-      when :today
-        rel.where(paid_at: Time.current.all_day)
-      when :this_week
-        rel.where(paid_at: Time.current.all_week)
-      when :this_month
-        rel.where(paid_at: Time.current.all_month)
-      when :this_quarter
-        rel.where(paid_at: Time.current.all_quarter)
-      when :this_year
-        rel.where(paid_at: Time.current.all_year)
-      when :last_month
-        rel.where(paid_at: 1.month.ago.all_month)
-      when :last_quarter
-        rel.where(paid_at: 1.quarter.ago.all_quarter)
-      when :last_year
-        rel.where(paid_at: 1.year.ago.all_year)
-      else
-        rel
-      end
+      rel.where(paid_at: resolve_period(@period))
     end
   end
 end

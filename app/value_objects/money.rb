@@ -25,8 +25,10 @@
 #   price.to_s                # "100.00 EUR"
 #   price.formatted_amount    # "100.00"
 #
-class Money
+class Money < ApplicationValueObject
   include Comparable
+
+  value_attributes :amount, :currency, skip_presence: true
 
   # @return [BigDecimal] the monetary amount
   attr_reader :amount
@@ -109,21 +111,6 @@ class Money
     amount <=> other.amount
   end
 
-  # Equality check. Both amount and currency must match.
-  #
-  # @param other [Money] the money to compare
-  # @return [Boolean] true if equal
-  def ==(other)
-    other.is_a?(Money) && amount == other.amount && currency == other.currency
-  end
-  alias eql? ==
-
-  # Hash code for use in hash tables.
-  #
-  # @return [Integer] hash code
-  def hash
-    [ amount, currency ].hash
-  end
 
   # ============================================
   # Predicates

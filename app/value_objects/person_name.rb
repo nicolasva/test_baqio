@@ -19,7 +19,9 @@
 # @example Empty name
 #   PersonName.empty.blank?  # => true
 #
-class PersonName
+class PersonName < ApplicationValueObject
+  value_attributes :first_name, :last_name
+
   # @return [String, nil] the first name
   attr_reader :first_name
   # @return [String, nil] the last name
@@ -33,28 +35,6 @@ class PersonName
     @first_name = normalize(first_name)
     @last_name = normalize(last_name)
     freeze
-  end
-
-  # ============================================
-  # Equality
-  # ============================================
-
-  # Checks equality based on first and last name.
-  #
-  # @param other [PersonName] the name to compare
-  # @return [Boolean] true if equal
-  def ==(other)
-    other.is_a?(PersonName) &&
-      first_name == other.first_name &&
-      last_name == other.last_name
-  end
-  alias eql? ==
-
-  # Hash code for use in hash tables.
-  #
-  # @return [Integer] hash code
-  def hash
-    [ first_name, last_name ].hash
   end
 
   # ============================================
@@ -86,24 +66,6 @@ class PersonName
       .compact_blank
       .map { |name| name[0]&.upcase }
       .join
-  end
-
-  # ============================================
-  # Predicates
-  # ============================================
-
-  # Checks if at least one name component is present.
-  #
-  # @return [Boolean] true if has any name
-  def present?
-    first_name.present? || last_name.present?
-  end
-
-  # Checks if both name components are blank.
-  #
-  # @return [Boolean] true if no name
-  def blank?
-    !present?
   end
 
   # Returns string representation (full name).

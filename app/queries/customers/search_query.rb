@@ -18,6 +18,8 @@ module Customers
   #   })
   #
   class SearchQuery < ApplicationQuery
+    include DateFilterable
+
     # Initializes with search parameters.
     #
     # @param relation [ActiveRecord::Relation] base relation
@@ -110,9 +112,7 @@ module Customers
 
     # Filters by creation date range.
     def filter_by_created_at(rel)
-      rel = rel.where("customers.created_at >= ?", @params[:from_date]) if @params[:from_date].present?
-      rel = rel.where("customers.created_at <= ?", @params[:to_date].end_of_day) if @params[:to_date].present?
-      rel
+      filter_by_date_range(rel, table_name: "customers", from: @params[:from_date], to: @params[:to_date])
     end
 
     # Applies sorting. Handles special cases for name and orders_count.

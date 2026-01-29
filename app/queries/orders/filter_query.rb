@@ -20,6 +20,8 @@ module Orders
   #   })
   #
   class FilterQuery < ApplicationQuery
+    include DateFilterable
+
     # Initializes the filter query with optional filters.
     #
     # @param relation [ActiveRecord::Relation] base relation to filter
@@ -79,9 +81,7 @@ module Orders
 
     # Filters by date range using from_date and to_date.
     def filter_by_date_range(rel)
-      rel = rel.where("orders.created_at >= ?", @filters[:from_date]) if @filters[:from_date].present?
-      rel = rel.where("orders.created_at <= ?", @filters[:to_date].end_of_day) if @filters[:to_date].present?
-      rel
+      super(rel, table_name: "orders", from: @filters[:from_date], to: @filters[:to_date])
     end
 
     # Filters by total_amount range.

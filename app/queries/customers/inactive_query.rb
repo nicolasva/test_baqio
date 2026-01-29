@@ -23,6 +23,13 @@ module Customers
   #   # => { inactive_30_60_days: [...], inactive_60_90_days: [...], ... }
   #
   class InactiveQuery < ApplicationQuery
+    include GroupedQuery
+
+    has_groups(
+      never_ordered: :never_ordered,
+      no_recent_orders: :no_recent_orders
+    )
+
     # Default inactivity threshold in days
     DEFAULT_INACTIVE_DAYS = 90
 
@@ -39,7 +46,7 @@ module Customers
     #
     # @return [ActiveRecord::Relation] inactive customers
     def call
-      relation.where(id: inactive_customer_ids)
+      relation.where(id: all_ids)
     end
 
     # Customers who have never placed an order.
@@ -108,13 +115,6 @@ module Customers
       Customer.all
     end
 
-    # Collects IDs from all inactive categories.
-    def inactive_customer_ids
-      [
-        never_ordered.pluck(:id),
-        no_recent_orders.pluck(:id)
-      ].flatten.uniq
-    end
 
     # Finds customers inactive for a specific duration range.
     def inactive_between(min_days, max_days)

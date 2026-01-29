@@ -19,6 +19,8 @@ module Customers
   #   query.revenue_percentage  # => 45.5 (top customers represent 45.5% of revenue)
   #
   class TopSpendersQuery < ApplicationQuery
+    include PeriodFilterable
+
     # Initializes with limit and optional period filter.
     #
     # @param relation [ActiveRecord::Relation] base relation
@@ -99,22 +101,7 @@ module Customers
 
     # Applies period filter to purchases.
     def filter_by_period(query)
-      case @period
-      when Range
-        query.where(invoices: { paid_at: @period })
-      when :this_month
-        query.where(invoices: { paid_at: Time.current.all_month })
-      when :this_quarter
-        query.where(invoices: { paid_at: Time.current.all_quarter })
-      when :this_year
-        query.where(invoices: { paid_at: Time.current.all_year })
-      when :last_month
-        query.where(invoices: { paid_at: 1.month.ago.all_month })
-      when :last_year
-        query.where(invoices: { paid_at: 1.year.ago.all_year })
-      else
-        query
-      end
+      query.where(invoices: { paid_at: resolve_period(@period) })
     end
 
     # Calculates average order value for a customer.

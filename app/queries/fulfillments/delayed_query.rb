@@ -24,6 +24,14 @@ module Fulfillments
   #   query.stats  # => { total_delayed: 15, stuck_pending: 3, ... }
   #
   class DelayedQuery < ApplicationQuery
+    include GroupedQuery
+
+    has_groups(
+      stuck_pending: :stuck_in_pending,
+      stuck_processing: :stuck_in_processing,
+      shipping_delayed: :shipping_taking_too_long
+    )
+
     # Default threshold for pending/processing stages (days)
     DEFAULT_PROCESSING_THRESHOLD = 2
     # Default threshold for shipping time (days)
@@ -45,18 +53,7 @@ module Fulfillments
     #
     # @return [ActiveRecord::Relation] delayed fulfillments
     def call
-      relation.where(id: all_delayed_ids)
-    end
-
-    # Groups delayed fulfillments by delay type.
-    #
-    # @return [Hash] fulfillments by delay category
-    def grouped
-      {
-        stuck_pending: stuck_in_pending,
-        stuck_processing: stuck_in_processing,
-        shipping_delayed: shipping_taking_too_long
-      }
+      relation.where(id: all_ids)
     end
 
     # Fulfillments stuck in pending status.
@@ -139,14 +136,6 @@ module Fulfillments
       Fulfillment.all
     end
 
-    # Collects all delayed fulfillment IDs.
-    def all_delayed_ids
-      [
-        stuck_in_pending.pluck(:id),
-        stuck_in_processing.pluck(:id),
-        shipping_taking_too_long.pluck(:id)
-      ].flatten.uniq
-    end
 
     # Returns info about the oldest pending fulfillment.
     def oldest_pending_info

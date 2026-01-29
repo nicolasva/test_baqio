@@ -17,6 +17,8 @@ module Orders
   #   query.recent(limit: 5)
   #
   class DashboardQuery < ApplicationQuery
+    include PeriodFilterable
+
     # Initializes the dashboard query with a time period.
     #
     # @param relation [ActiveRecord::Relation] base relation
@@ -78,28 +80,7 @@ module Orders
     #
     # @return [Range] date range for the period
     def date_range
-      case @period
-      when :today
-        Time.current.all_day
-      when :yesterday
-        1.day.ago.all_day
-      when :this_week
-        Time.current.all_week
-      when :last_week
-        1.week.ago.all_week
-      when :this_month
-        Time.current.all_month
-      when :last_month
-        1.month.ago.all_month
-      when :this_quarter
-        Time.current.all_quarter
-      when :this_year
-        Time.current.all_year
-      when Range
-        @period
-      else
-        Time.current.all_day
-      end
+      resolve_period(@period)
     end
 
     # Calculates total revenue from paid invoices.

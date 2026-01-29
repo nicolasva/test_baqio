@@ -14,7 +14,9 @@
 # @example Empty tracking
 #   TrackingInfo.empty.blank?  # => true
 #
-class TrackingInfo
+class TrackingInfo < ApplicationValueObject
+  value_attributes :number, :carrier, skip_presence: true
+
   # @return [String, nil] the tracking number (uppercase)
   attr_reader :number
   # @return [String, nil] the carrier name (uppercase)
@@ -40,28 +42,6 @@ class TrackingInfo
     @number = normalize_number(number)
     @carrier = normalize_carrier(carrier)
     freeze
-  end
-
-  # ============================================
-  # Equality
-  # ============================================
-
-  # Checks equality based on number and carrier.
-  #
-  # @param other [TrackingInfo] the tracking info to compare
-  # @return [Boolean] true if equal
-  def ==(other)
-    other.is_a?(TrackingInfo) &&
-      number == other.number &&
-      carrier == other.carrier
-  end
-  alias eql? ==
-
-  # Hash code for use in hash tables.
-  #
-  # @return [Integer] hash code
-  def hash
-    [ number, carrier ].hash
   end
 
   # ============================================

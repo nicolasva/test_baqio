@@ -22,6 +22,15 @@ module Invoices
   #   query.stats  # => { total_overdue: 25, total_overdue_amount: 50000, ... }
   #
   class NeedingFollowUpQuery < ApplicationQuery
+    include GroupedQuery
+
+    has_groups(
+      critical: :critical,
+      high: :high_priority,
+      medium: :medium_priority,
+      low: :low_priority
+    )
+
     def initialize(relation = default_relation, options: {})
       super(relation)
       @options = options
@@ -31,20 +40,13 @@ module Invoices
     #
     # @return [ActiveRecord::Relation] invoices requiring action
     def call
-      relation.where(id: all_needing_follow_up_ids)
+      relation.where(id: all_ids)
     end
 
     # Groups invoices by priority level for work queues.
     #
     # @return [Hash] invoices by priority level
-    def grouped_by_priority
-      {
-        critical: critical,
-        high: high_priority,
-        medium: medium_priority,
-        low: low_priority
-      }
-    end
+    alias_method :grouped_by_priority, :grouped
 
     # Critical priority: invoices 60+ days overdue.
     # These require immediate escalation and may become bad debt.
@@ -131,15 +133,6 @@ module Invoices
       Invoice.all
     end
 
-    # Collects all invoice IDs needing follow-up.
-    def all_needing_follow_up_ids
-      [
-        critical.pluck(:id),
-        high_priority.pluck(:id),
-        medium_priority.pluck(:id),
-        low_priority.pluck(:id)
-      ].flatten.uniq
-    end
 
     # Calculates average days overdue for all overdue invoices.
     def average_days_overdue
