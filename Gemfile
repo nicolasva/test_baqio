@@ -17,6 +17,18 @@ gem "stimulus-rails"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 
+gem 'seedbank'
+gem 'seed_dump'
+
+# Pagination
+gem 'kaminari'
+
+# Decorators
+gem 'draper'
+
+# Slim templates
+gem 'slim-rails'
+
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"
 
@@ -52,6 +64,13 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  # RSpec testing framework
+  gem "rspec-rails"
+  gem "factory_bot_rails"
+
+  # Fake data generation
+  gem "faker"
 end
 
 group :development do
@@ -63,4 +82,8 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
+
+  # Cucumber for BDD testing
+  gem "cucumber-rails", require: false
+  gem "database_cleaner-active_record"
 end
