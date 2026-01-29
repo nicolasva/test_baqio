@@ -11,6 +11,8 @@
 #   account.total_revenue # => 15000.0
 #
 class Account < ApplicationRecord
+  include InvoiceAggregatable
+
   # ============================================
   # Associations
   # ============================================
@@ -62,7 +64,5 @@ class Account < ApplicationRecord
   # Only includes invoices with status "paid".
   #
   # @return [Float] total revenue amount
-  def total_revenue
-    invoices.paid.sum(:total_amount)
-  end
+  alias_method :total_revenue, :total_paid_amount
 end

@@ -16,6 +16,8 @@
 #   customer.display_name # => "John Doe" or "john@example.com" or "Customer #123"
 #
 class Customer < ApplicationRecord
+  include InvoiceAggregatable
+
   # ============================================
   # Associations
   # ============================================
@@ -68,9 +70,7 @@ class Customer < ApplicationRecord
   # Only counts paid invoices (includes tax).
   #
   # @return [Float] total spent amount
-  def total_spent
-    invoices.paid.sum(:total_amount)
-  end
+  alias_method :total_spent, :total_paid_amount
 
   # Returns the number of orders placed by this customer.
   #
