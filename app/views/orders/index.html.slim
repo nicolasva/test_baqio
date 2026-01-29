@@ -11,11 +11,11 @@ table.orders-list.table
   tbody
     - orders.each do |order|
       tr
-        td=order.reference
-        td=order.status_name
-        td=order.customer
-        td=order.fulfillment.fulfillment_service
-        td=order.fulfillment_status
+        td= order.reference
+        td= order.status_name
+        td= order.customer_name
+        td= order.fulfillment_service_name
+        td= order.fulfillment_status
         td.text-right= order.total_quantity
         td.text-right= order.total_price
 
