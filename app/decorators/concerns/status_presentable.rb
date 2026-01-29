@@ -72,9 +72,9 @@ module StatusPresentable
       end
 
       # Define method to render status as HTML badge
-      # Combines status_name and status_badge in a span element
+      # Delegates to ApplicationHelper#status_badge_tag
       define_method(:status_with_badge) do
-        h.content_tag(:span, status_name, class: "badge #{status_badge}")
+        h.status_badge_tag(status_name, status_badge)
       end
     end
   end

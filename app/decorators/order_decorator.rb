@@ -98,13 +98,11 @@ class OrderDecorator < ApplicationDecorator
   end
 
   # ============================================
-  # Link Helpers
+  # Link Helpers (delegated to OrdersHelper)
   # ============================================
 
-  # Returns a link to the order detail page.
-  #
-  # @return [String] HTML link to order
+  # @return [String] HTML link with order reference
   def reference_link
-    h.link_to(reference, h.order_path(object))
+    h.order_reference_link(object)
   end
 end

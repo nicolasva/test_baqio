@@ -43,23 +43,11 @@ class InvoiceDecorator < ApplicationDecorator
   # Due Date Methods
   # ============================================
 
-  # Returns a formatted due status indicator.
-  # Shows different messages based on due date status:
-  # - Overdue: red text with days overdue
-  # - Due soon (within 7 days): warning text
-  # - Otherwise: muted text with days remaining
+  # Delegates to InvoicesHelper#due_status.
   #
   # @return [String, nil] HTML span with status or nil if not applicable
   def due_status
-    return nil unless due_at && sent?
-
-    if overdue?
-      h.content_tag(:span, "Overdue (#{days_overdue} days)", class: "text-danger")
-    elsif days_until_due <= 7
-      h.content_tag(:span, "Due soon (#{days_until_due} days)", class: "text-warning")
-    else
-      h.content_tag(:span, "#{days_until_due} days remaining", class: "text-muted")
-    end
+    h.due_status(object)
   end
 
   # ============================================
