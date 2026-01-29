@@ -168,51 +168,9 @@ RSpec.describe Customer, type: :model do
     end
   end
 
+  # full_name and display_name tests are in spec/decorators/customer_decorator_spec.rb
+
   describe "Customer information methods" do
-    describe "Getting the full name" do
-      it "combines first and last name" do
-        customer = build(:customer, first_name: "John", last_name: "Doe")
-        expect(customer.full_name).to eq("John Doe")
-      end
-
-      it "returns just the first name if there is no last name" do
-        customer = build(:customer, first_name: "John", last_name: nil)
-        expect(customer.full_name).to eq("John")
-      end
-
-      it "returns just the last name if there is no first name" do
-        customer = build(:customer, first_name: nil, last_name: "Doe")
-        expect(customer.full_name).to eq("Doe")
-      end
-
-      it "returns nothing if there is no name at all" do
-        customer = build(:customer, first_name: nil, last_name: nil)
-        expect(customer.full_name).to be_nil
-      end
-
-      it "treats empty strings as no name" do
-        customer = build(:customer, first_name: "", last_name: "")
-        expect(customer.full_name).to be_nil
-      end
-    end
-
-    describe "Getting the display name (for showing in the UI)" do
-      it "shows the full name if available" do
-        customer = build(:customer, first_name: "John", last_name: "Doe")
-        expect(customer.display_name).to eq("John Doe")
-      end
-
-      it "shows the email if there is no name" do
-        customer = build(:customer, first_name: nil, last_name: nil, email: "test@example.com")
-        expect(customer.display_name).to eq("test@example.com")
-      end
-
-      it "shows 'Customer #ID' if there is no name or email" do
-        customer = create(:customer, first_name: nil, last_name: nil, email: nil)
-        expect(customer.display_name).to eq("Customer ##{customer.id}")
-      end
-    end
-
     describe "Calculating total spent by customer" do
       let(:account) { create(:account) }
       let(:customer) { create(:customer, account: account) }

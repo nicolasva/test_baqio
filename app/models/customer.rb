@@ -61,21 +61,8 @@ class Customer < ApplicationRecord
   # Instance Methods
   # ============================================
 
-  # Returns the customer's full name by joining first and last name.
-  # Returns nil if both names are blank.
-  #
-  # @return [String, nil] full name or nil
-  def full_name
-    [first_name, last_name].compact_blank.join(" ").presence
-  end
-
-  # Returns the best available name for display purposes.
-  # Priority: full name > email > "Customer #ID"
-  #
-  # @return [String] display name
-  def display_name
-    full_name || email || "Customer ##{id}"
-  end
+  # full_name and display_name are presentation methods
+  # defined in CustomerDecorator.
 
   # Calculates total amount spent by this customer.
   # Only counts paid invoices (includes tax).

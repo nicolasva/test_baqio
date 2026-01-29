@@ -91,7 +91,7 @@ end
 # ===== Assertion Steps =====
 
 Then("the customer {string} exists") do |full_name|
-  expect(@customer.full_name).to eq(full_name)
+  expect(@customer.decorate.full_name).to eq(full_name)
 end
 
 Then("the customer has email {string}") do |email|
@@ -99,11 +99,11 @@ Then("the customer has email {string}") do |email|
 end
 
 Then("the customer display name is {string}") do |display_name|
-  expect(@customer.display_name).to eq(display_name)
+  expect(@customer.decorate.display_name).to eq(display_name)
 end
 
 Then("the customer display name contains {string}") do |text|
-  expect(@customer.display_name).to include(text)
+  expect(@customer.decorate.display_name).to include(text)
 end
 
 Then("the customer initials are {string}") do |initials|

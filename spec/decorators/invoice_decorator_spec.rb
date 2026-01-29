@@ -84,7 +84,7 @@ RSpec.describe InvoiceDecorator do
 
   describe "#customer_name" do
     it "returns customer display name through order" do
-      expect(decorated_invoice.customer_name).to eq(customer.display_name)
+      expect(decorated_invoice.customer_name).to eq(customer.decorate.display_name)
     end
   end
 

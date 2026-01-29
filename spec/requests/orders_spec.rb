@@ -56,7 +56,7 @@ RSpec.describe "Orders", type: :request do
       it "displays customer names" do
         get orders_path
 
-        expect(response.body).to include(customer.display_name)
+        expect(response.body).to include(customer.decorate.display_name)
       end
     end
 
