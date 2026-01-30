@@ -42,16 +42,18 @@ module Customers
     end
 
     # Returns top customers with computed statistics.
-    # More detailed than call but loads all records into memory.
+    # Uses virtual attributes from the SQL query to avoid N+1 queries.
     #
     # @return [Array<Hash>] customer data with statistics
     def with_stats
       call.map do |customer|
+        spent = customer.read_attribute("total_spent").to_f
+        count = customer.read_attribute("orders_count").to_i
         {
           customer: customer,
-          total_spent: customer.total_spent,
-          orders_count: customer.orders_count,
-          average_order_value: average_order_value(customer)
+          total_spent: spent,
+          orders_count: count,
+          average_order_value: count.zero? ? 0 : (spent / count).round(2)
         }
       end
     end
@@ -64,12 +66,15 @@ module Customers
     end
 
     # Calculates what percentage of total revenue comes from top customers.
-    # Useful for understanding revenue concentration.
+    # Uses virtual attributes and a single SQL query to avoid N+1.
     #
     # @return [Float] percentage of revenue from top customers
     def revenue_percentage
-      top_revenue = call.sum(&:total_spent)
-      total_revenue = relation.sum(&:total_spent)
+      top_revenue = call.sum { |c| c.read_attribute("total_spent").to_f }
+      total_revenue = relation
+        .joins(orders: :invoice)
+        .where(invoices: { status: "paid" })
+        .sum("invoices.total_amount")
 
       return 0 if total_revenue.zero?
 
@@ -104,11 +109,5 @@ module Customers
       query.where(invoices: { paid_at: resolve_period(@period) })
     end
 
-    # Calculates average order value for a customer.
-    def average_order_value(customer)
-      return 0 if customer.orders_count.zero?
-
-      (customer.total_spent / customer.orders_count).round(2)
-    end
   end
 end
