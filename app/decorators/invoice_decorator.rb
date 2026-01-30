@@ -59,7 +59,7 @@ class InvoiceDecorator < ApplicationDecorator
   #
   # @return [String, nil] customer name or nil
   def customer_name
-    order&.customer&.decorate&.display_name
+    decorated_customer&.display_name
   end
 
   # Returns the order reference number.
@@ -67,5 +67,11 @@ class InvoiceDecorator < ApplicationDecorator
   # @return [String, nil] order reference or nil
   def order_reference
     order&.reference
+  end
+
+  private
+
+  def decorated_customer
+    @decorated_customer ||= order&.customer&.decorate
   end
 end

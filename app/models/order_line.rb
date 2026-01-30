@@ -49,8 +49,8 @@ class OrderLine < ApplicationRecord
   # Calculate total price before saving
   before_validation :calculate_total_price
 
-  # Update order total when line is saved or destroyed
-  after_save :update_order_total
+  # Update order total when total_price changes or line is destroyed
+  after_save :update_order_total, if: :saved_change_to_total_price?
   after_destroy :update_order_total
 
   # ============================================

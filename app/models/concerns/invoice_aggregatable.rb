@@ -20,4 +20,10 @@ module InvoiceAggregatable
   def total_paid_amount
     invoices.paid.sum(:total_amount)
   end
+
+  # Semantic aliases for use in different contexts:
+  # - total_spent: for Customer (how much they spent)
+  # - total_revenue: for Account (how much revenue it generated)
+  alias_method :total_spent, :total_paid_amount
+  alias_method :total_revenue, :total_paid_amount
 end

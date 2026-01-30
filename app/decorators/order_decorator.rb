@@ -45,7 +45,7 @@ class OrderDecorator < ApplicationDecorator
   #
   # @return [String, nil] customer name or nil
   def customer_name
-    customer&.decorate&.display_name
+    decorated_customer&.display_name
   end
 
   # ============================================
@@ -56,18 +56,14 @@ class OrderDecorator < ApplicationDecorator
   #
   # @return [String, nil] fulfillment status or nil if no fulfillment
   def fulfillment_status
-    return nil unless fulfillment
-
-    fulfillment.decorate.status_name
+    decorated_fulfillment&.status_name
   end
 
   # Returns the fulfillment service name.
   #
   # @return [String, nil] service name or nil if no fulfillment
   def fulfillment_service_name
-    return nil unless fulfillment
-
-    fulfillment.decorate.service_name
+    decorated_fulfillment&.service_name
   end
 
   # ============================================
@@ -104,5 +100,15 @@ class OrderDecorator < ApplicationDecorator
   # @return [String] HTML link with order reference
   def reference_link
     h.order_reference_link(object)
+  end
+
+  private
+
+  def decorated_customer
+    @decorated_customer ||= customer&.decorate
+  end
+
+  def decorated_fulfillment
+    @decorated_fulfillment ||= fulfillment&.decorate
   end
 end

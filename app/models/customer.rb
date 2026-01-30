@@ -66,12 +66,6 @@ class Customer < ApplicationRecord
   # full_name and display_name are presentation methods
   # defined in CustomerDecorator.
 
-  # Calculates total amount spent by this customer.
-  # Only counts paid invoices (includes tax).
-  #
-  # @return [Float] total spent amount
-  alias_method :total_spent, :total_paid_amount
-
   # Returns the number of orders placed by this customer.
   #
   # @return [Integer] order count

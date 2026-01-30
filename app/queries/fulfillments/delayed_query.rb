@@ -91,16 +91,25 @@ module Fulfillments
     end
 
     # Computes delay statistics for monitoring.
+    # Loads all delayed fulfillments once and computes stats in memory.
     #
     # @return [Hash] delay metrics
     def stats
+      delayed = call.to_a
+      pending = delayed.select { |f| f.status == "pending" }
+      oldest = pending.min_by(&:created_at)
+
       {
-        total_delayed: call.count,
-        stuck_pending: stuck_in_pending.count,
-        stuck_processing: stuck_in_processing.count,
-        shipping_delayed: shipping_taking_too_long.count,
-        oldest_pending: oldest_pending_info,
-        average_delay: average_delay_days
+        total_delayed: delayed.size,
+        stuck_pending: pending.size,
+        stuck_processing: delayed.count { |f| f.status == "processing" },
+        shipping_delayed: delayed.count { |f| f.status == "shipped" },
+        oldest_pending: oldest && {
+          id: oldest.id,
+          created_at: oldest.created_at,
+          days_pending: (Time.current - oldest.created_at).to_i / 1.day
+        },
+        average_delay: compute_average_delay(delayed)
       }
     end
 
@@ -138,21 +147,9 @@ module Fulfillments
     end
 
 
-    # Returns info about the oldest pending fulfillment.
-    def oldest_pending_info
-      oldest = stuck_in_pending.first
-      return nil unless oldest
-
-      {
-        id: oldest.id,
-        created_at: oldest.created_at,
-        days_pending: (Time.current - oldest.created_at).to_i / 1.day
-      }
-    end
-
-    # Calculates average delay days across all delayed fulfillments.
-    def average_delay_days
-      safe_average(call, precision: 1) do |f|
+    # Calculates average delay days from a pre-loaded array.
+    def compute_average_delay(delayed)
+      safe_average(delayed, precision: 1) do |f|
         case f.status
         when "pending" then (Time.current - f.created_at).to_i / 1.day
         when "processing" then (Time.current - f.updated_at).to_i / 1.day

@@ -60,9 +60,4 @@ class Account < ApplicationRecord
     orders.where.not(status: "cancelled")
   end
 
-  # Calculates the total revenue from all paid invoices.
-  # Only includes invoices with status "paid".
-  #
-  # @return [Float] total revenue amount
-  alias_method :total_revenue, :total_paid_amount
 end
