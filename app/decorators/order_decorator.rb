@@ -20,10 +20,10 @@ class OrderDecorator < ApplicationDecorator
 
   # Define status presentation (name and badge class for each status)
   has_status_presentation(
-    pending: { name: "Pending", badge: "badge-warning" },
-    invoiced: { name: "Invoiced", badge: "badge-info" },
-    validated: { name: "Validated", badge: "badge-success" },
-    cancelled: { name: "Cancelled", badge: "badge-danger" }
+    **StatusPresentable::COMMON_STATUSES,
+    pending: "badge-warning",
+    invoiced: "badge-info",
+    validated: "badge-success"
   )
 
   # ============================================

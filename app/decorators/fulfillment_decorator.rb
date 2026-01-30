@@ -20,11 +20,11 @@ class FulfillmentDecorator < ApplicationDecorator
 
   # Define status presentation (name and badge class for each status)
   has_status_presentation(
-    pending: { name: "Pending", badge: "badge-secondary" },
-    processing: { name: "Processing", badge: "badge-warning" },
-    shipped: { name: "Shipped", badge: "badge-info" },
-    delivered: { name: "Delivered", badge: "badge-success" },
-    cancelled: { name: "Cancelled", badge: "badge-danger" }
+    **StatusPresentable::COMMON_STATUSES,
+    pending: "badge-secondary",
+    processing: "badge-warning",
+    shipped: "badge-info",
+    delivered: "badge-success"
   )
 
   # ============================================

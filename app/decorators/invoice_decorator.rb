@@ -20,10 +20,10 @@ class InvoiceDecorator < ApplicationDecorator
 
   # Define status presentation (name and badge class for each status)
   has_status_presentation(
-    draft: { name: "Draft", badge: "badge-secondary" },
-    sent: { name: "Sent", badge: "badge-info" },
-    paid: { name: "Paid", badge: "badge-success" },
-    cancelled: { name: "Cancelled", badge: "badge-danger" }
+    **StatusPresentable::COMMON_STATUSES,
+    draft: "badge-secondary",
+    sent: "badge-info",
+    paid: "badge-success"
   )
 
   # ============================================
