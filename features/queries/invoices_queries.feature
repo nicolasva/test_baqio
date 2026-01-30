@@ -60,7 +60,7 @@ Feature: Advanced invoice queries
     Then I find 1 critical invoice
 
   Scenario: Identify invoices to follow up this week
-    Given an invoice due in 3 days exists
+    Given an invoice due later this week exists
     And an invoice due in 10 days exists
     When I search for invoices to follow up this week
     Then I find 1 invoice to follow up

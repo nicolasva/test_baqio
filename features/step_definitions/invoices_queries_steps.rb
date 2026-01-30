@@ -44,6 +44,13 @@ Given("an invoice overdue by {int} days exists") do |days|
   create(:invoice, :sent, order: order, due_at: days.days.ago, issued_at: (days + 30).days.ago)
 end
 
+Given("an invoice due later this week exists") do
+  @account ||= create(:account)
+  @customer ||= create(:customer, account: @account)
+  order = create(:order, :validated, account: @account, customer: @customer)
+  create(:invoice, :sent, order: order, due_at: Date.current.end_of_week, issued_at: Date.current)
+end
+
 Given("an invoice due in {int} days exists") do |days|
   @account ||= create(:account)
   @customer ||= create(:customer, account: @account)
