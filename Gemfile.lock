@@ -397,7 +397,7 @@ GEM
       activesupport (>= 4)
     seedbank (0.5.0)
       rake (>= 10.0)
-    selenium-webdriver (4.40.0)
+    selenium-webdriver (4.41.0)
       base64 (~> 0.2)
       logger (~> 1.4)
       rexml (~> 3.2, >= 3.2.5)
@@ -670,7 +670,7 @@ CHECKSUMS
   securerandom (0.4.1) sha256=cc5193d414a4341b6e225f0cb4446aceca8e50d5e1888743fac16987638ea0b1
   seed_dump (3.4.1) sha256=37bf975bd0fcef39c18e1904405605fa0e6559bd0469bcf55949d0f288e57526
   seedbank (0.5.0) sha256=9840c0bf3427ac9ac0815feceeceeeac76dc89039503d393a7e220184855f437
-  selenium-webdriver (4.40.0) sha256=16ef7aa9853c1d4b9d52eac45aafa916e3934c5c83cb4facb03f250adfd15e5b
+  selenium-webdriver (4.41.0) sha256=cdc1173cd55cf186022cea83156cc2d0bec06d337e039b02ad25d94e41bedd22
   slim (5.2.1) sha256=72351dff7e2ff20e2d5c393cfc385bb9142cef5db059141628fd7163ac3c13e7
   slim-rails (4.0.0) sha256=2cfee5c4ba00d4d935676db1e74a05dbaf9dd6f789903a1006e3bb687bbe36e2
   solid_cable (3.0.12) sha256=a168a54731a455d5627af48d8441ea3b554b8c1f6e6cd6074109de493e6b0460
